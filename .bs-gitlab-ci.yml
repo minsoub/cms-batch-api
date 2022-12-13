@@ -1,0 +1,45 @@
+image: eclipse-temurin:17-jdk-alpine
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+
+variables:
+  SAST_JAVA_VERSION: "17"
+
+stages:
+  - compile
+  - validate
+  - test
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+compile:
+  stage: compile
+  script:
+    - ./gradlew assemble
+
+code_style:
+  stage: validate
+  script:
+    - ./gradlew ktlintCheck
+  allow_failure: false
+
+detekt_job:
+  stage: validate
+  script:
+    - ./gradlew detekt
+
+spotbugs-sast:
+    stage: test
+    artifacts:
+      paths:
+        - 'gl-sast-report.json'
+    variables:
+        SAST_EXCLUDED_PATHS: spec, test, tests, tmp, server/libs, assets, vendor, *.min.js
+        SECURE_LOG_LEVEL: "info"
