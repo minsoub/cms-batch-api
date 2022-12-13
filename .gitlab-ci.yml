@@ -1,26 +1,55 @@
-# You can override the included template(s) by including variable overrides
-# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
-# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
-# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
-# Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
-# Note that environment variables can be set in several places
-# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
-stages:
-- build
-- test
-- deploy
-- review
-- dast
-- staging
-- canary
-- production
-- incremental rollout 10%
-- incremental rollout 25%
-- incremental rollout 50%
-- incremental rollout 100%
-- performance
-- cleanup
-sast:
-  stage: test
+image: eclipse-temurin:17-jdk-alpine
+
 include:
-- template: Auto-DevOps.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
+
+variables:
+  SAST_JAVA_VERSION: "17"
+
+stages:
+  - compile
+  - validate
+  - sast
+  # - test
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+compile:
+  stage: compile
+  script:
+    - ./gradlew assemble
+
+code_style:
+  stage: validate
+  script:
+    - ./gradlew ktlintCheck
+  allow_failure: false
+
+detekt_job:
+  stage: validate
+  script:
+    - ./gradlew detekt
+
+spotbugs-sast:
+    stage: sast
+    artifacts:
+      paths:
+        - 'gl-sast-report.json'
+    variables:
+        SAST_EXCLUDED_PATHS: spec, test, tests, tmp, server/libs, assets, vendor, *.min.js
+        SECURE_LOG_LEVEL: "info"
+
+# test:
+#   stage: test
+#   script:
+#     - ./gradlew koverVerify
+#   artifacts:
+#     when: always
+#     reports:
+#       junit: build/test-results/test/**/TEST-*.xml
