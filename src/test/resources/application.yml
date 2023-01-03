@@ -1,0 +1,65 @@
+spring:
+    main:
+        banner-mode: "off"
+        allow-bean-definition-overriding: true
+        web-application-type: SERVLET
+    batch:
+        job:
+            enabled: false
+    config:
+        activate:
+            on-profile: test
+    data:
+        mongodb:
+            auto-index-creation: true
+            uuid-representation: standard
+            field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+            uri: localhost
+            port: 27017
+            username: cms-systems
+            database: smartcmslocaldb
+            password: cms-systems
+    redis:
+        host: localhost
+        port: 6379
+
+management:
+    endpoints:
+        web:
+            exposure:
+                include: metrics, prometheus, health
+
+logging:
+    level:
+        root: ${cms.batch.api.logging.level.root:INFO}
+        org:
+            springframework:
+                data:
+                    convert:
+                        CustomConversions: ERROR
+                    mongodb:
+                        core:
+                            MongoTemplate: ${cms.batch.api.logging.level.mongo:INFO}
+            io:
+                spring:
+                    cloud: INFO
+
+cloud:
+    aws:
+        credentials:
+            profile-name: ${aws.default.profile:dev}
+        stack:
+            auto: ${aws.stack.auto:false}
+        region:
+            static: ${aws.region:ap-northeast-2}
+            auto: ${aws.region.auto:false}
+        ssm:
+            endpoint: https://ssm.ap-northeast-2.amazonaws.com
+        kms:
+            endpoint: https://kms.ap-northeast-2.amazonaws.com
+        param-store:
+            prefix: /cms
+            smart-prefix: /smartadmin
+            doc-name: mongodb
+            kms-name: kms
+            redis-name: redis

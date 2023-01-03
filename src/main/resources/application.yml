@@ -1,0 +1,89 @@
+spring:
+  main:
+    banner-mode: "off"
+    allow-bean-definition-overriding: true
+    web-application-type: SERVLET
+  batch:
+    job:
+      enabled: false
+  data:
+    mongodb:
+      auto-index-creation: true
+      uuid-representation: standard
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+      uri: localhost
+      port: 27017
+      username: cms-systems
+      database: smartcmslocaldb
+      password: cms-systems
+  redis:
+    host: localhost
+    port: 6379
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: metrics, prometheus, health
+
+logging:
+  level:
+    root: ${cms.batch.api.logging.level.root:INFO}
+    org:
+      springframework:
+        data:
+          convert:
+            CustomConversions: ERROR
+          mongodb:
+            core:
+              MongoTemplate: ${cms.batch.api.logging.level.mongo:INFO}
+      io:
+          spring:
+              cloud: INFO
+  config: classpath:logback-spring-${spring.profiles.active}.xml
+
+cloud:
+    aws:
+        param-store:
+            prefix: /cms
+            smart-prefix: /smartadmin
+            doc-name: mongodb
+            kms-name: kms
+            redis-name: redis
+
+---
+spring:
+    config:
+        import: classpath:aws-properties.yml
+        activate:
+            on-profile: local
+---
+spring:
+    config:
+        import: classpath:aws-properties-dev.yml
+        activate:
+            on-profile: dev
+---
+spring:
+    config:
+        import: classpath:aws-properties-eks-dev.yml
+        activate:
+            on-profile: eks-dev
+---
+spring:
+    config:
+        import: classpath:aws-properties-qa.yml
+        activate:
+            on-profile: qa
+---
+spring:
+    config:
+        import: classpath:aws-properties-perform.yml
+        activate:
+            on-profile: perform
+---
+spring:
+    config:
+        import: classpath:aws-properties-prod.yml
+        activate:
+            on-profile: prod
