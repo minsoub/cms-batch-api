@@ -4,6 +4,8 @@ cloud:
             profile-name: ${aws.default.profile:dev}
         stack:
             auto: ${aws.stack.auto:false}
+        s3:
+            bucket: ${auth.aws.s3.bucket:cms-dev-bucket}
         region:
             static: ${aws.region:ap-northeast-2}
             auto: ${aws.region.auto:false}

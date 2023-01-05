@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration
 class AwsProperties(
     @Value("\${cloud.aws.credentials.profile-name}") val profileName: String,
     @Value("\${cloud.aws.region.static}") val region: String,
+    @Value("\${cloud.aws.s3.bucket}") val bucket: String,
     @Value("\${cloud.aws.ssm.endpoint}") val ssmEndPoint: String,
     @Value("\${cloud.aws.kms.endpoint}") val kmsEndPoint: String
 ) {

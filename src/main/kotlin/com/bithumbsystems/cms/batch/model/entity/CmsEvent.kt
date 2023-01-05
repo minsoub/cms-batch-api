@@ -1,5 +1,6 @@
 package com.bithumbsystems.cms.batch.model.entity
 
+import com.bithumbsystems.cms.batch.config.redis.entity.RedisBoard
 import com.bithumbsystems.cms.batch.model.enums.EventTarget
 import com.bithumbsystems.cms.batch.model.enums.EventType
 import org.springframework.data.mongodb.core.mapping.Document
@@ -12,7 +13,7 @@ class CmsEvent(
     val id: String,
     val title: String,
     val isFixTop: Boolean = false,
-    val isShow: Boolean = true,
+    var isShow: Boolean = true,
     val isDelete: Boolean = false,
     val content: String,
     val fileId: String? = null,
@@ -39,10 +40,16 @@ class CmsEvent(
     val updateDate: LocalDateTime? = null,
     val useUpdateDate: Boolean = false,
     val isAlignTop: Boolean = false,
-    val screenDate: LocalDateTime
+    var screenDate: LocalDateTime?
 )
 
 class Message(
     val participateMessage: String,
     val duplicateMessage: String
+)
+
+fun CmsEvent.toRedisEntity(): RedisBoard = RedisBoard(
+    id = id,
+    title = title,
+    createDate = createDate
 )

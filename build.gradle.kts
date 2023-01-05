@@ -53,6 +53,9 @@ dependencies {
     implementation("org.redisson:redisson-spring-boot-starter:3.17.6")
     implementation("it.ozimov:embedded-redis:0.7.1")
 
+    implementation("net.javacrumbs.shedlock:shedlock-provider-redis-spring:5.0.1")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:5.0.1")
+
     // mongo
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 

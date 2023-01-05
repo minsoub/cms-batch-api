@@ -1,5 +1,7 @@
 package com.bithumbsystems.cms.batch.model.entity
 
+import com.bithumbsystems.cms.batch.config.redis.entity.RedisThumbnail
+import com.bithumbsystems.cms.batch.service.BoardService.Companion.s3Url
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.MongoId
 import java.time.LocalDateTime
@@ -10,11 +12,12 @@ class CmsReviewReport(
     val id: String,
     val title: String,
     val isFixTop: Boolean = false,
-    val isShow: Boolean = true,
+    var isShow: Boolean = true,
     val isDelete: Boolean = false,
     val content: String,
     val fileId: String? = null,
-    val thumbnailFileId: String? = null,
+    var thumbnailFileId: String? = null,
+    var thumbnailUrl: String? = null,
     val shareTitle: String? = null,
     val shareDescription: String? = null,
     val shareFileId: String? = null,
@@ -29,5 +32,12 @@ class CmsReviewReport(
     val updateDate: LocalDateTime? = null,
     val useUpdateDate: Boolean = false,
     val isAlignTop: Boolean = false,
-    val screenDate: LocalDateTime
+    var screenDate: LocalDateTime?
+)
+
+fun CmsReviewReport.toRedisEntity(): RedisThumbnail = RedisThumbnail(
+    id = id,
+    title = title,
+    thumbnailUrl = thumbnailUrl ?: "$s3Url/$thumbnailFileId",
+    createDate = createDate
 )
