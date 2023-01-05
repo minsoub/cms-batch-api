@@ -44,5 +44,5 @@ fun CmsNotice.toRedisEntity(cmsNoticeCategoryMap: Map<String, String>): RedisNot
     categoryNames = categoryIds.map { categoryId ->
         cmsNoticeCategoryMap[categoryId]!!
     }.toList(),
-    screenDate = screenDate ?: createDate
+    createDate = createDate
 )

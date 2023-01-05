@@ -1,5 +1,6 @@
 package com.bithumbsystems.cms.batch.model.entity
 
+import com.bithumbsystems.cms.batch.config.redis.entity.RedisBoard
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.MongoId
 import java.time.LocalDateTime
@@ -10,7 +11,7 @@ class CmsPressRelease(
     val id: String,
     val title: String,
     val isFixTop: Boolean = false,
-    val isShow: Boolean = true,
+    var isShow: Boolean = true,
     val isDelete: Boolean = false,
     val content: String,
     val fileId: String? = null,
@@ -28,5 +29,11 @@ class CmsPressRelease(
     val updateDate: LocalDateTime? = null,
     val useUpdateDate: Boolean = false,
     val isAlignTop: Boolean = false,
-    val screenDate: LocalDateTime
+    var screenDate: LocalDateTime?
+)
+
+fun CmsPressRelease.toRedisEntity(): RedisBoard = RedisBoard(
+    id = id,
+    title = title,
+    createDate = createDate
 )

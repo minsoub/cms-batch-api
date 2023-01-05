@@ -5,6 +5,8 @@ cloud:
             instanceProfile: true
         stack:
             auto: ${auth.aws.stack.auto:false}
+        s3:
+            bucket: ${auth.aws.s3.bucket:cms-dev-bucket}
         region:
             static: ${auth.aws.region:ap-northeast-2}
             auto: ${auth.aws.region.auto:false}

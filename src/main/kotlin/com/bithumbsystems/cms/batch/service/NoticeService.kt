@@ -70,7 +70,7 @@ class NoticeService(
                 typeReference = object : TypeReference<List<RedisNotice>>() {}
             )
         }
-        logger.info("[CmsNoticeReserved][saveRedisMainNotice] finally")
+        logger.info("[CmsNoticeReserved][saveRedisMainNotice] END")
         return newList.count()
     }
 
@@ -90,7 +90,7 @@ class NoticeService(
                 it
             }
         )
-        logger.info("[CmsNoticeReserved][saveRedisNoticeBanner] finally")
+        logger.info("[CmsNoticeReserved][saveRedisNoticeBanner] END")
 
         return cmsNotice.id
     }
@@ -106,7 +106,7 @@ class NoticeService(
                 typeReference = object : TypeReference<List<RedisNotice>>() {}
             )
         }
-        logger.info("[CmsNoticeReserved][saveRedisFixNotice] finally")
+        logger.info("[CmsNoticeReserved][saveRedisFixNotice] END")
         return fixTopList.count()
     }
 }
