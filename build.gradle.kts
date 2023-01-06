@@ -87,7 +87,7 @@ detekt {
 
 tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     enabled = true
-    mainClass.set("com.bithumbsystems.cms.CmsBatchApiApplication")
+    mainClass.set("com.bithumbsystems.cms.CmsBatchApiApplicationKt")
 }
 
 tasks.jar {
