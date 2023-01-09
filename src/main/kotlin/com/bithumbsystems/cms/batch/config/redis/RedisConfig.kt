@@ -38,7 +38,7 @@ class RedisConfig(
     }
 
     @Bean
-    fun lockProvider(connectionFactory: RedisConnectionFactory): LockProvider? {
+    fun lockProvider(connectionFactory: RedisConnectionFactory): LockProvider {
         return RedisLockProvider(connectionFactory, profile)
     }
 }
@@ -81,7 +81,7 @@ class RedisLocalConfig(
     fun redissonClient(): RedissonClient = Redisson.create(config)
 
     @Bean
-    fun lockProvider(connectionFactory: RedisConnectionFactory): LockProvider? {
+    fun lockProvider(connectionFactory: RedisConnectionFactory): LockProvider {
         return RedisLockProvider(connectionFactory, profile)
     }
 }

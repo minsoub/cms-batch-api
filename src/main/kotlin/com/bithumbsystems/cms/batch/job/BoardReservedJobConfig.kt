@@ -3,6 +3,7 @@ package com.bithumbsystems.cms.batch.job
 import com.bithumbsystems.cms.batch.service.BoardService
 import com.bithumbsystems.cms.batch.service.NoticeService
 import com.bithumbsystems.cms.batch.service.PressReleaseService
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParametersBuilder
@@ -24,6 +25,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import java.util.*
 
 @Configuration
+@EnableSchedulerLock(defaultLockAtMostFor = "30s")
 class BoardReservedJobConfig(
     private val noticeService: NoticeService,
     private val boardService: BoardService,

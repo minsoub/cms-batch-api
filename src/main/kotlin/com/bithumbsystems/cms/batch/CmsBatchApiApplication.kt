@@ -1,6 +1,5 @@
 package com.bithumbsystems.cms.batch
 
-import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
@@ -17,7 +16,6 @@ import org.springframework.scheduling.annotation.EnableScheduling
 )
 @EnableBatchProcessing
 @EnableScheduling
-@EnableSchedulerLock(defaultLockAtMostFor = "30s")
 @ConfigurationPropertiesScan("com.bithumbsystems.cms.batch.config")
 class CmsBatchApiApplication
 
