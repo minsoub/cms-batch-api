@@ -38,7 +38,7 @@ class CmsEvent(
     val createDate: LocalDateTime = LocalDateTime.now(),
     val updateAccountId: String? = null,
     val updateDate: LocalDateTime? = null,
-    val useUpdateDate: Boolean = false,
+    val isUseUpdateDate: Boolean = false,
     val isAlignTop: Boolean = false,
     var screenDate: LocalDateTime?
 )
