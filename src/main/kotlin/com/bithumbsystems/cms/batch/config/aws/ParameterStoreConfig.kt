@@ -39,6 +39,8 @@ class ParameterStoreConfig(
                 Region.of(awsProperties.region)
             ).build()
         } else {
+            ssmClient = SsmClient.builder().endpointOverride(URI.create(awsProperties.ssmEndPoint))
+                .region(Region.of(awsProperties.region)).build()
             mongoProperties = MongoProperties(
                 getParameterValue(
                     parameterStoreProperties.prefix,
@@ -90,8 +92,6 @@ class ParameterStoreConfig(
                     parameterStoreProperties.kmsName,
                     ParameterStoreCode.KMS_ALIAS_NAME.value
                 )
-            ssmClient = SsmClient.builder().endpointOverride(URI.create(awsProperties.ssmEndPoint))
-                .region(Region.of(awsProperties.region)).build()
         }
     }
 

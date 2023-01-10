@@ -20,6 +20,8 @@ spring:
       username: cms-systems
       database: smartcmslocaldb
       password: cms-systems
+  pid:
+      file: ${instance.pid}
   redis:
     host: localhost
     port: 6379
