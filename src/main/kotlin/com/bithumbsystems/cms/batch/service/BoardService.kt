@@ -5,6 +5,7 @@ import com.bithumbsystems.cms.batch.config.redis.RedisKeys
 import com.bithumbsystems.cms.batch.config.redis.RedisRepository
 import com.bithumbsystems.cms.batch.config.redis.entity.RedisBoard
 import com.bithumbsystems.cms.batch.config.redis.entity.RedisThumbnail
+import com.bithumbsystems.cms.batch.model.entity.CmsInvestmentWarning
 import com.bithumbsystems.cms.batch.model.entity.toRedisEntity
 import com.bithumbsystems.cms.batch.model.repository.CmsEconomicResearchRepository
 import com.bithumbsystems.cms.batch.model.repository.CmsEventRepository
@@ -38,7 +39,7 @@ class BoardService(
 
     @Transactional
     fun reservedReviewReportJob(): String {
-        val targetList = cmsReviewReportRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateAsc(
+        val targetList = cmsReviewReportRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
             now = LocalDateTime.now()
         )
         val targetCount = targetList.count()
@@ -79,48 +80,39 @@ class BoardService(
 
     @Transactional
     fun reservedInvestmentWarningJob(): String {
-        val targetList = cmsInvestmentWarningRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateAsc(
+        val fixTop = cmsInvestmentWarningRepository.findFirstByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
             now = LocalDateTime.now()
         )
-        val targetCount = targetList.count()
-        var fixTopList = 0
-        logger.info("[CmsBoardReserved] START : count: $targetCount")
+        logger.info("[CmsBoardReserved] START")
 
-        var hasIsFixTop = false
-
-        targetList.map {
-            hasIsFixTop = it.isFixTop
-            it.isShow = true
-            it.screenDate = it.scheduleDate
-            cmsInvestmentWarningRepository.save(it)
+        fixTop?.apply {
+            this.isShow = true
+            this.screenDate = this.scheduleDate
+            cmsInvestmentWarningRepository.save(this)
+            saveRedisFixInvestmentWarning(this)
         }
 
-        if (hasIsFixTop) {
-            fixTopList = saveRedisFixInvestmentWarning()
-        }
         logger.info("[CmsBoardReserved] END")
 
-        return "targetCount: $targetCount, fixTopListCount: $fixTopList"
+        return "fixTop: ${fixTop?.id}"
     }
 
-    private fun saveRedisFixInvestmentWarning(): Int {
+    private fun saveRedisFixInvestmentWarning(fixTop: CmsInvestmentWarning) {
         logger.info("[CmsBoardReserved][saveRedisFixInvestmentWarning] START")
-        val fixTopList = cmsInvestmentWarningRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndFixTopTrueOrderByScreenDateDesc()
 
-        fixTopList.map { item -> item.toRedisEntity() }.toList().also { totalList ->
+        fixTop.toRedisEntity().also {
             redisRepository.addOrUpdateRBucket(
                 bucketKey = RedisKeys.CMS_INVESTMENT_WARNING_FIX,
-                value = totalList,
-                typeReference = object : TypeReference<List<RedisBoard>>() {}
+                value = it.id,
+                typeReference = object : TypeReference<String>() {}
             )
         }
         logger.info("[CmsBoardReserved][saveRedisFixInvestmentWarning] END")
-        return fixTopList.count()
     }
 
     @Transactional
     fun reservedEventJob(): String {
-        val targetList = cmsEventRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateAsc(
+        val targetList = cmsEventRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
             now = LocalDateTime.now()
         )
         val targetCount = targetList.count()
@@ -161,7 +153,7 @@ class BoardService(
 
     @Transactional
     fun reservedEconomicResearchJob(): String {
-        val targetList = cmsEconomicResearchRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateAsc(
+        val targetList = cmsEconomicResearchRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
             now = LocalDateTime.now()
         )
         val targetCount = targetList.count()

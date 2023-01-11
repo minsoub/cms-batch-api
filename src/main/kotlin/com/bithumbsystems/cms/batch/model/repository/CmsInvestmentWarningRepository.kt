@@ -5,6 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import java.time.LocalDateTime
 
 interface CmsInvestmentWarningRepository : MongoRepository<CmsInvestmentWarning, String> {
-    fun findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateAsc(now: LocalDateTime): List<CmsInvestmentWarning>
-    fun findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndFixTopTrueOrderByScreenDateDesc(): List<CmsInvestmentWarning>
+    fun findFirstByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(now: LocalDateTime): CmsInvestmentWarning?
 }

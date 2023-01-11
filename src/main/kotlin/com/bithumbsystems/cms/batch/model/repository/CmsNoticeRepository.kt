@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 @Repository
 interface CmsNoticeRepository : MongoRepository<CmsNotice, String> {
-    fun findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateAsc(now: LocalDateTime): List<CmsNotice>
+    fun findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(now: LocalDateTime): List<CmsNotice>
 
     fun findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndFixTopTrueOrderByScreenDateDesc(): List<CmsNotice>
 

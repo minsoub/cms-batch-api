@@ -21,7 +21,7 @@ class PressReleaseService(
 
     @Transactional
     fun reservedJob(): String {
-        val releaseReservedList = cmsPressReleaseRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateAsc(
+        val releaseReservedList = cmsPressReleaseRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
             now = LocalDateTime.now()
         )
 

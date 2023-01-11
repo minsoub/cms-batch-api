@@ -24,7 +24,7 @@ class NoticeService(
 
     @Transactional
     fun reservedJob(): String {
-        val cmsNoticeScheduleList = cmsNoticeRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateAsc(
+        val cmsNoticeScheduleList = cmsNoticeRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
             now = LocalDateTime.now()
         )
         val cmsNoticeCategoryMap = cmsNoticeCategoryRepository.findByIsUseTrueAndIsDeleteFalse().associate {
