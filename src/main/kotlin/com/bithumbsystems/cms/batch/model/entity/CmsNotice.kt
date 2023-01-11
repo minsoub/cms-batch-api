@@ -10,7 +10,7 @@ import java.util.*
 class CmsNotice(
     @MongoId
     val id: String = UUID.randomUUID().toString().replace("-", ""),
-    var categoryIds: List<String>,
+    var categoryIds: List<String?>?,
     var title: String,
     var content: String,
     val createAccountId: String,
@@ -41,8 +41,10 @@ class CmsNotice(
 fun CmsNotice.toRedisEntity(cmsNoticeCategoryMap: Map<String, String>): RedisNotice = RedisNotice(
     id = id,
     title = title,
-    categoryNames = categoryIds.map { categoryId ->
-        cmsNoticeCategoryMap[categoryId]!!
-    }.toList(),
+    categoryNames = categoryIds?.map { categoryId ->
+        categoryId?.let {
+            cmsNoticeCategoryMap[it]
+        } ?: "1"
+    }?.toList() ?: listOf(),
     createDate = createDate
 )
