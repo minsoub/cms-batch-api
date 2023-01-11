@@ -34,7 +34,7 @@ class NoticeService(
         var noticeBannerId = ""
         var newListCount = 0
         var fixTopList = 0
-        logger.info("[CmsNoticeReserved] START : count: $targetCount")
+        logger.info("[CmsNoticeReserved] START : count: $targetCount cmsNoticeCategoryMap: $cmsNoticeCategoryMap")
 
         var hasIsFixTop = false
 
