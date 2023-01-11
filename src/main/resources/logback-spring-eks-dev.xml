@@ -44,23 +44,23 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="com.bithumbsystems" level="DEBUG" additivity="false">
+    <logger name="com.bithumbsystems" level="INFO" additivity="false">
         <appender-ref ref="ROLLING_ROOT"/>
         <appender-ref ref="ROLLING_ERROR"/>
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="org.apache.coyote.http11.Http11InputBuffer" level="DEBUG" additivity="false">
+    <logger name="org.apache.coyote.http11.Http11InputBuffer" level="INFO" additivity="false">
         <appender-ref ref="ROLLING_ROOT"/>
         <appender-ref ref="ROLLING_ERROR"/>
         <appender-ref ref="STDOUT"/>
     </logger>
-    <logger name="springframework.security" level="DEBUG" additivity="false">
+    <logger name="springframework.security" level="INFO" additivity="false">
         <appender-ref ref="ROLLING_ROOT"/>
         <appender-ref ref="ROLLING_ERROR"/>
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="ROLLING_ROOT"/>
         <appender-ref ref="STDOUT"/>
     </root>
