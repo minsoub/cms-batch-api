@@ -1,7 +1,6 @@
 package com.bithumbsystems.cms.batch.config.redis
 
 import com.bithumbsystems.cms.batch.config.aws.ParameterStoreConfig
-import com.bithumbsystems.cms.batch.util.PortCheckUtil.findAvailablePort
 import com.bithumbsystems.cms.batch.util.PortCheckUtil.isRunning
 import net.javacrumbs.shedlock.core.LockProvider
 import net.javacrumbs.shedlock.provider.redis.spring.RedisLockProvider
@@ -16,7 +15,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import redis.embedded.RedisServer
 import java.io.IOException
 import javax.annotation.PostConstruct
-import javax.annotation.PreDestroy
 
 @Configuration
 @Profile(value = ["dev", "qa", "perform", "prod", "eks-dev", "eks-prod"])
@@ -57,14 +55,14 @@ class RedisLocalConfig(
     @Throws(IOException::class)
     fun redisServer() {
         val redisPort =
-            if (isRunning(parameterStoreConfig.redisProperties.port)) findAvailablePort()
+            if (isRunning(parameterStoreConfig.redisProperties.port)) parameterStoreConfig.redisProperties.port
             else parameterStoreConfig.redisProperties.port
 
-        redisServer = RedisServer.builder()
-            .port(redisPort)
-            .setting("maxmemory 128M")
-            .build()
-        redisServer?.start()
+//        redisServer = RedisServer.builder()
+//            .port(redisPort)
+//            .setting("maxmemory 128M")
+//            .build()
+//        redisServer?.start()
 
         config.useSingleServer().address = "redis://${parameterStoreConfig.redisProperties.host}:$redisPort"
         if (!parameterStoreConfig.redisProperties.token.isNullOrEmpty()) {
@@ -72,10 +70,10 @@ class RedisLocalConfig(
         }
     }
 
-    @PreDestroy
-    fun stopRedis() {
-        redisServer?.stop()
-    }
+//    @PreDestroy
+//    fun stopRedis() {
+//        redisServer?.stop()
+//    }
 
     @Bean
     fun redissonClient(): RedissonClient = Redisson.create(config)

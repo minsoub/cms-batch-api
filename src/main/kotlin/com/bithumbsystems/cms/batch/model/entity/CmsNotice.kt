@@ -14,6 +14,7 @@ class CmsNotice(
     var categoryIds: List<String?>?,
     var title: String,
     var content: String,
+    val searchContent: String,
     val createAccountId: String,
     val createAccountEmail: String,
     val createDate: LocalDateTime = LocalDateTime.now()

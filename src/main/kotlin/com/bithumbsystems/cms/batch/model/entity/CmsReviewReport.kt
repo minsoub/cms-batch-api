@@ -15,6 +15,7 @@ class CmsReviewReport(
     var isShow: Boolean = true,
     val isDelete: Boolean = false,
     val content: String,
+    val searchContent: String,
     val fileId: String? = null,
     var thumbnailFileId: String? = null,
     var thumbnailUrl: String? = null,
