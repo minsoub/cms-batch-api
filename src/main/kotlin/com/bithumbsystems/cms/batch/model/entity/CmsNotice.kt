@@ -1,5 +1,6 @@
 package com.bithumbsystems.cms.batch.model.entity
 
+import com.bithumbsystems.cms.batch.config.redis.entity.RedisBanner
 import com.bithumbsystems.cms.batch.config.redis.entity.RedisNotice
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.MongoId
@@ -38,13 +39,14 @@ class CmsNotice(
     var updateDate: LocalDateTime? = null
 }
 
-fun CmsNotice.toRedisEntity(cmsNoticeCategoryMap: Map<String, String>): RedisNotice = RedisNotice(
+fun CmsNotice.toRedisEntity(categoryNames: List<String>): RedisNotice = RedisNotice(
     id = id,
     title = title,
-    categoryNames = categoryIds?.map { categoryId ->
-        categoryId?.let {
-            cmsNoticeCategoryMap[it]
-        } ?: "1"
-    }?.toList() ?: listOf(),
+    categoryNames = categoryNames,
     createDate = createDate
+)
+
+fun CmsNotice.toRedisBanner(title: String): RedisBanner = RedisBanner(
+    id = id,
+    title = title
 )

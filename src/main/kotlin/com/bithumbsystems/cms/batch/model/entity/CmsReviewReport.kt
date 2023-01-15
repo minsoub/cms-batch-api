@@ -22,7 +22,7 @@ class CmsReviewReport(
     val shareDescription: String? = null,
     val shareFileId: String? = null,
     val shareButtonName: String? = null,
-    val isSchedule: Boolean = false,
+    var isSchedule: Boolean = false,
     val scheduleDate: LocalDateTime? = null,
     val isDraft: Boolean = false,
     val readCount: Long = 0,

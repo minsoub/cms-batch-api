@@ -2,7 +2,9 @@ package com.bithumbsystems.cms.batch.service
 
 import com.bithumbsystems.cms.batch.config.redis.RedisKeys
 import com.bithumbsystems.cms.batch.config.redis.RedisRepository
+import com.bithumbsystems.cms.batch.config.redis.entity.RedisBanner
 import com.bithumbsystems.cms.batch.config.redis.entity.RedisBoard
+import com.bithumbsystems.cms.batch.model.entity.toRedisBanner
 import com.bithumbsystems.cms.batch.model.entity.toRedisEntity
 import com.bithumbsystems.cms.batch.model.repository.CmsPressReleaseRepository
 import com.bithumbsystems.cms.batch.util.Logger
@@ -21,9 +23,10 @@ class PressReleaseService(
 
     @Transactional
     fun reservedJob(): String {
-        val releaseReservedList = cmsPressReleaseRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
-            now = LocalDateTime.now()
-        )
+        val releaseReservedList = cmsPressReleaseRepository
+            .findByScheduleDateBeforeAndIsScheduleTrueAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
+                now = LocalDateTime.now()
+            )
 
         val targetCount = releaseReservedList.count()
         var newListCount = 0
@@ -35,6 +38,7 @@ class PressReleaseService(
         releaseReservedList.map { cmsPressRelease ->
             hasIsFixTop = cmsPressRelease.isFixTop
             cmsPressRelease.isShow = true
+            cmsPressRelease.isSchedule = false
             cmsPressRelease.screenDate = cmsPressRelease.scheduleDate
             newListCount = saveRedisMainPressRelease()
             cmsPressReleaseRepository.save(cmsPressRelease)
@@ -52,11 +56,11 @@ class PressReleaseService(
         logger.info("[PressReleaseReserved][saveRedisMainPressRelease] START")
         val newList = cmsPressReleaseRepository.findFirst5ByIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc()
 
-        newList.map { it.toRedisEntity() }.toList().also { topList ->
+        newList.map { it.toRedisBanner() }.also { topList ->
             redisRepository.addOrUpdateRBucket(
                 bucketKey = RedisKeys.CMS_PRESS_RELEASE_RECENT,
                 value = topList,
-                typeReference = object : TypeReference<List<RedisBoard>>() {}
+                typeReference = object : TypeReference<List<RedisBanner>>() {}
             )
         }
         logger.info("[PressReleaseReserved][saveRedisMainPressRelease] END")
@@ -65,9 +69,9 @@ class PressReleaseService(
 
     private fun saveRedisFixPressRelease(): Int {
         logger.info("[PressReleaseReserved][saveRedisFixPressRelease] START")
-        val fixTopList = cmsPressReleaseRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndFixTopTrueOrderByScreenDateDesc()
+        val fixTopList = cmsPressReleaseRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndIsFixTopTrueOrderByScreenDateDesc()
 
-        fixTopList.map { item -> item.toRedisEntity() }.toList().also { totalList ->
+        fixTopList.map { item -> item.toRedisEntity() }.also { totalList ->
             redisRepository.addOrUpdateRBucket(
                 bucketKey = RedisKeys.CMS_PRESS_RELEASE_FIX,
                 value = totalList,

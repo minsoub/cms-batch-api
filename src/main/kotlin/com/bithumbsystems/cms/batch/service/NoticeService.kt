@@ -2,8 +2,10 @@ package com.bithumbsystems.cms.batch.service
 
 import com.bithumbsystems.cms.batch.config.redis.RedisKeys
 import com.bithumbsystems.cms.batch.config.redis.RedisRepository
+import com.bithumbsystems.cms.batch.config.redis.entity.RedisBanner
 import com.bithumbsystems.cms.batch.config.redis.entity.RedisNotice
 import com.bithumbsystems.cms.batch.model.entity.CmsNotice
+import com.bithumbsystems.cms.batch.model.entity.toRedisBanner
 import com.bithumbsystems.cms.batch.model.entity.toRedisEntity
 import com.bithumbsystems.cms.batch.model.repository.CmsNoticeCategoryRepository
 import com.bithumbsystems.cms.batch.model.repository.CmsNoticeRepository
@@ -24,10 +26,11 @@ class NoticeService(
 
     @Transactional
     fun reservedJob(): String {
-        val cmsNoticeScheduleList = cmsNoticeRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
-            now = LocalDateTime.now()
-        )
-        val cmsNoticeCategoryMap = cmsNoticeCategoryRepository.findByIsUseTrueAndIsDeleteFalse().associate {
+        val cmsNoticeScheduleList =
+            cmsNoticeRepository.findByScheduleDateBeforeAndIsScheduleTrueAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
+                now = LocalDateTime.now()
+            )
+        val cmsNoticeCategoryMap = cmsNoticeCategoryRepository.findAll().associate {
             it.id to it.name
         }
         val targetCount = cmsNoticeScheduleList.count()
@@ -41,6 +44,7 @@ class NoticeService(
         cmsNoticeScheduleList.map { cmsNotice ->
             hasIsFixTop = cmsNotice.isFixTop
             cmsNotice.isShow = true
+            cmsNotice.isSchedule = false
             cmsNotice.screenDate = cmsNotice.scheduleDate
             if (cmsNotice.isBanner) {
                 noticeBannerId = saveRedisNoticeBanner(cmsNoticeCategoryMap, cmsNotice)
@@ -63,11 +67,11 @@ class NoticeService(
         logger.info("[CmsNoticeReserved][saveRedisMainNotice] START")
         val newList = cmsNoticeRepository.findFirst5ByIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc()
 
-        newList.map { it.toRedisEntity(cmsNoticeCategoryMap) }.toList().also { topList ->
+        newList.map { it.toRedisBanner(title = makeToTitle(it, cmsNoticeCategoryMap)) }.also { topList ->
             redisRepository.addOrUpdateRBucket(
                 bucketKey = RedisKeys.CMS_NOTICE_RECENT,
                 value = topList,
-                typeReference = object : TypeReference<List<RedisNotice>>() {}
+                typeReference = object : TypeReference<List<RedisBanner>>() {}
             )
         }
         logger.info("[CmsNoticeReserved][saveRedisMainNotice] END")
@@ -81,8 +85,8 @@ class NoticeService(
         logger.info("[CmsNoticeReserved][saveRedisNoticeBanner] START")
         redisRepository.addOrUpdateRBucket(
             bucketKey = RedisKeys.CMS_NOTICE_BANNER,
-            value = cmsNotice.toRedisEntity(cmsNoticeCategoryMap),
-            typeReference = object : TypeReference<RedisNotice>() {}
+            value = cmsNotice.toRedisBanner(title = makeToTitle(cmsNotice, cmsNoticeCategoryMap)),
+            typeReference = object : TypeReference<RedisBanner>() {}
         )
         cmsNoticeRepository.saveAll(
             cmsNoticeRepository.findByIsBannerTrueAndScheduleDateBefore(now = cmsNotice.screenDate ?: cmsNotice.createDate).map {
@@ -97,9 +101,17 @@ class NoticeService(
 
     private fun saveRedisFixNotice(cmsNoticeCategoryMap: Map<String, String>): Int {
         logger.info("[CmsNoticeReserved][saveRedisFixNotice] START")
-        val fixTopList = cmsNoticeRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndFixTopTrueOrderByScreenDateDesc()
+        val fixTopList = cmsNoticeRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndIsFixTopTrueOrderByScreenDateDesc()
 
-        fixTopList.map { item -> item.toRedisEntity(cmsNoticeCategoryMap) }.toList().also { totalList ->
+        fixTopList.map { item ->
+            val categoryNames = mutableListOf<String>()
+            item.categoryIds?.map { categoryId ->
+                if (cmsNoticeCategoryMap.containsKey(categoryId)) {
+                    cmsNoticeCategoryMap[categoryId]?.let { categoryNames.add(it) }
+                }
+            }
+            item.toRedisEntity(categoryNames)
+        }.also { totalList ->
             redisRepository.addOrUpdateRBucket(
                 bucketKey = RedisKeys.CMS_NOTICE_FIX,
                 value = totalList,
@@ -108,5 +120,15 @@ class NoticeService(
         }
         logger.info("[CmsNoticeReserved][saveRedisFixNotice] END")
         return fixTopList.count()
+    }
+
+    private fun makeToTitle(
+        it: CmsNotice,
+        categoryMap: Map<String, String>
+    ): String {
+        val categoryTitle = it.categoryIds?.map { id ->
+            categoryMap[id]
+        }?.joinToString("/", "[", "]")
+        return (categoryTitle + it.title).trim()
     }
 }

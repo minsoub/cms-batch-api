@@ -39,9 +39,10 @@ class BoardService(
 
     @Transactional
     fun reservedReviewReportJob(): String {
-        val targetList = cmsReviewReportRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
-            now = LocalDateTime.now()
-        )
+        val targetList =
+            cmsReviewReportRepository.findByScheduleDateBeforeAndIsScheduleTrueAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
+                now = LocalDateTime.now()
+            )
         val targetCount = targetList.count()
         var fixTopList = 0
         logger.info("[CmsBoardReserved] START : count: $targetCount")
@@ -51,6 +52,7 @@ class BoardService(
         targetList.map {
             hasIsFixTop = it.isFixTop
             it.isShow = true
+            it.isSchedule = false
             it.screenDate = it.scheduleDate
             cmsReviewReportRepository.save(it)
         }
@@ -65,9 +67,9 @@ class BoardService(
 
     private fun saveRedisFixReviewReport(): Int {
         logger.info("[CmsBoardReserved][saveRedisFixInvestmentWarning] START")
-        val fixTopList = cmsReviewReportRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndFixTopTrueOrderByScreenDateDesc()
+        val fixTopList = cmsReviewReportRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndIsFixTopTrueOrderByScreenDateDesc()
 
-        fixTopList.map { item -> item.toRedisEntity() }.toList().also { totalList ->
+        fixTopList.map { item -> item.toRedisEntity() }.also { totalList ->
             redisRepository.addOrUpdateRBucket(
                 bucketKey = RedisKeys.CMS_REVIEW_REPORT_FIX,
                 value = totalList,
@@ -80,13 +82,15 @@ class BoardService(
 
     @Transactional
     fun reservedInvestmentWarningJob(): String {
-        val fixTop = cmsInvestmentWarningRepository.findFirstByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
-            now = LocalDateTime.now()
-        )
+        val fixTop = cmsInvestmentWarningRepository
+            .findFirstByScheduleDateBeforeAndIsScheduleTrueAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
+                now = LocalDateTime.now()
+            )
         logger.info("[CmsBoardReserved] START")
 
         fixTop?.apply {
             this.isShow = true
+            this.isSchedule = false
             this.screenDate = this.scheduleDate
             cmsInvestmentWarningRepository.save(this)
             saveRedisFixInvestmentWarning(this)
@@ -112,9 +116,10 @@ class BoardService(
 
     @Transactional
     fun reservedEventJob(): String {
-        val targetList = cmsEventRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
-            now = LocalDateTime.now()
-        )
+        val targetList = cmsEventRepository
+            .findByScheduleDateBeforeAndIsScheduleTrueAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
+                now = LocalDateTime.now()
+            )
         val targetCount = targetList.count()
         var fixTopList = 0
         logger.info("[CmsBoardReserved] START : count: $targetCount")
@@ -124,6 +129,7 @@ class BoardService(
         targetList.map {
             hasIsFixTop = it.isFixTop
             it.isShow = true
+            it.isSchedule = false
             it.screenDate = it.scheduleDate
             cmsEventRepository.save(it)
         }
@@ -138,9 +144,9 @@ class BoardService(
 
     private fun saveRedisFixEvent(): Int {
         logger.info("[CmsBoardReserved][saveRedisFixEconomicResearch] START")
-        val fixTopList = cmsEventRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndFixTopTrueOrderByScreenDateDesc()
+        val fixTopList = cmsEventRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndIsFixTopTrueOrderByScreenDateDesc()
 
-        fixTopList.map { item -> item.toRedisEntity() }.toList().also { totalList ->
+        fixTopList.map { item -> item.toRedisEntity() }.also { totalList ->
             redisRepository.addOrUpdateRBucket(
                 bucketKey = RedisKeys.CMS_EVENT_FIX,
                 value = totalList,
@@ -153,9 +159,10 @@ class BoardService(
 
     @Transactional
     fun reservedEconomicResearchJob(): String {
-        val targetList = cmsEconomicResearchRepository.findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
-            now = LocalDateTime.now()
-        )
+        val targetList = cmsEconomicResearchRepository
+            .findByScheduleDateBeforeAndIsScheduleTrueAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
+                now = LocalDateTime.now()
+            )
         val targetCount = targetList.count()
         var fixTopList = 0
         logger.info("[CmsBoardReserved] START : count: $targetCount")
@@ -165,6 +172,7 @@ class BoardService(
         targetList.map {
             hasIsFixTop = it.isFixTop
             it.isShow = true
+            it.isSchedule = false
             it.screenDate = it.scheduleDate
             cmsEconomicResearchRepository.save(it)
         }
@@ -179,9 +187,9 @@ class BoardService(
 
     private fun saveRedisFixEconomicResearch(): Int {
         logger.info("[CmsBoardReserved][saveRedisFixEconomicResearch] START")
-        val fixTopList = cmsEconomicResearchRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndFixTopTrueOrderByScreenDateDesc()
+        val fixTopList = cmsEconomicResearchRepository.findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndIsFixTopTrueOrderByScreenDateDesc()
 
-        fixTopList.map { item -> item.toRedisEntity() }.toList().also { totalList ->
+        fixTopList.map { item -> item.toRedisEntity() }.also { totalList ->
             redisRepository.addOrUpdateRBucket(
                 bucketKey = RedisKeys.CMS_ECONOMIC_RESEARCH_FIX,
                 value = totalList,

@@ -26,7 +26,7 @@ import java.util.*
 
 @Configuration
 @EnableSchedulerLock(defaultLockAtMostFor = "30s")
-class BoardReservedJobConfig(
+class CmsReservedJobConfig(
     private val noticeService: NoticeService,
     private val boardService: BoardService,
     private val pressReleaseService: PressReleaseService,
@@ -44,7 +44,7 @@ class BoardReservedJobConfig(
         val executor = ThreadPoolTaskExecutor()
         executor.corePoolSize = 3
         executor.maxPoolSize = 128
-        executor.setThreadNamePrefix("multi-thread-")
+        executor.setThreadNamePrefix("cms-multi-thread-")
         executor.setWaitForTasksToCompleteOnShutdown(true)
         executor.initialize()
         return executor

@@ -7,6 +7,8 @@ import java.time.LocalDateTime
 
 @Repository
 interface CmsEconomicResearchRepository : MongoRepository<CmsEconomicResearch, String> {
-    fun findByScheduleDateAfterAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(now: LocalDateTime): List<CmsEconomicResearch>
-    fun findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndFixTopTrueOrderByScreenDateDesc(): List<CmsEconomicResearch>
+    fun findByScheduleDateBeforeAndIsScheduleTrueAndIsShowTrueAndIsDeleteFalseAndIsDraftFalseOrderByScreenDateDesc(
+        now: LocalDateTime
+    ): List<CmsEconomicResearch>
+    fun findByIsShowTrueAndIsDeleteFalseAndIsDraftFalseAndIsFixTopTrueOrderByScreenDateDesc(): List<CmsEconomicResearch>
 }

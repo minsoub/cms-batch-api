@@ -1,5 +1,6 @@
 package com.bithumbsystems.cms.batch.model.entity
 
+import com.bithumbsystems.cms.batch.config.redis.entity.RedisBanner
 import com.bithumbsystems.cms.batch.config.redis.entity.RedisBoard
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.MongoId
@@ -19,7 +20,7 @@ class CmsPressRelease(
     val shareDescription: String? = null,
     val shareFileId: String? = null,
     val shareButtonName: String? = null,
-    val isSchedule: Boolean = false,
+    var isSchedule: Boolean = false,
     val scheduleDate: LocalDateTime? = null,
     val isDraft: Boolean = false,
     val readCount: Long = 0,
@@ -38,4 +39,9 @@ fun CmsPressRelease.toRedisEntity(): RedisBoard = RedisBoard(
     id = id,
     title = title,
     createDate = createDate
+)
+
+fun CmsPressRelease.toRedisBanner(): RedisBanner = RedisBanner(
+    id = id,
+    title = title
 )
